@@ -7,8 +7,10 @@ export function runOfflineTests({
   spawn = spawnSync,
   stdio = "inherit",
 } = {}) {
-  const command = platform === "win32" ? "pnpm.cmd" : "pnpm";
-  const result = spawn(command, ["-r", "test"], {
+  const isWindows = platform === "win32";
+  const command = isWindows ? (env.ComSpec ?? "cmd.exe") : "pnpm";
+  const args = isWindows ? ["/d", "/s", "/c", "pnpm -r test"] : ["-r", "test"];
+  const result = spawn(command, args, {
     env: { ...env, MOSS_SKIP_E2E: "1" },
     stdio,
   });
