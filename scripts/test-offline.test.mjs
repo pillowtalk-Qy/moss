@@ -25,6 +25,7 @@ test("sets MOSS_SKIP_E2E and runs the recursive workspace test command", () => {
 test("uses cmd.exe on Windows so command shims execute correctly", () => {
   let call;
   runOfflineTests({
+    env: {},
     platform: "win32",
     stdio: "pipe",
     spawn: (command, args, options) => {
