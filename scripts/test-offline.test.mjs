@@ -22,9 +22,26 @@ test("sets MOSS_SKIP_E2E and runs the recursive workspace test command", () => {
   assert.equal(call.options.env.MOSS_SKIP_E2E, "1");
 });
 
-test("uses the Windows pnpm command shim", () => {
+test("uses cmd.exe on Windows so command shims execute correctly", () => {
+  let call;
+  runOfflineTests({
+    platform: "win32",
+    stdio: "pipe",
+    spawn: (command, args, options) => {
+      call = { command, args, options };
+      return { status: 0 };
+    },
+  });
+
+  assert.equal(call.command, "cmd.exe");
+  assert.deepEqual(call.args, ["/d", "/s", "/c", "pnpm -r test"]);
+  assert.equal(call.options.env.MOSS_SKIP_E2E, "1");
+});
+
+test("respects ComSpec when Windows provides one", () => {
   let command;
   runOfflineTests({
+    env: { ComSpec: "C:\\Windows\\System32\\cmd.exe" },
     platform: "win32",
     stdio: "pipe",
     spawn: (nextCommand) => {
@@ -33,7 +50,7 @@ test("uses the Windows pnpm command shim", () => {
     },
   });
 
-  assert.equal(command, "pnpm.cmd");
+  assert.equal(command, "C:\\Windows\\System32\\cmd.exe");
 });
 
 test("returns the underlying test command exit status", () => {
