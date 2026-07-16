@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, codex/windows-shell-emulator-smoke]
   pull_request:
 
 concurrency:
